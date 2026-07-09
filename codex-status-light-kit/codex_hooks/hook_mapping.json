@@ -1,0 +1,10 @@
+{
+  "SessionStart": "IDLE",
+  "UserPromptSubmit": "THINKING",
+  "PreToolUse": "THINKING",
+  "PermissionRequest": "WAITING_USER",
+  "PostToolUse": "THINKING",
+  "PostToolUse.failure": "TOOL_ERROR",
+  "SubagentStop": "THINKING",
+  "Stop": "TASK_COMPLETE"
+}
