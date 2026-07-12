@@ -8,7 +8,7 @@
             "type": "command",
             "command": "python3 /absolute/path/to/codex-status-light-kit/codex_hooks/send_signal.py",
             "commandWindows": "python C:\\absolute\\path\\to\\codex-status-light-kit\\codex_hooks\\send_signal.py",
-            "timeout": 5,
+            "timeout": 12,
             "statusMessage": "Status light: session start"
           }
         ]
@@ -21,7 +21,7 @@
             "type": "command",
             "command": "python3 /absolute/path/to/codex-status-light-kit/codex_hooks/send_signal.py",
             "commandWindows": "python C:\\absolute\\path\\to\\codex-status-light-kit\\codex_hooks\\send_signal.py",
-            "timeout": 5,
+            "timeout": 12,
             "statusMessage": "Status light: thinking"
           }
         ]
@@ -35,7 +35,7 @@
             "type": "command",
             "command": "python3 /absolute/path/to/codex-status-light-kit/codex_hooks/send_signal.py",
             "commandWindows": "python C:\\absolute\\path\\to\\codex-status-light-kit\\codex_hooks\\send_signal.py",
-            "timeout": 5,
+            "timeout": 12,
             "statusMessage": "Status light: tool running"
           }
         ]
@@ -48,7 +48,7 @@
             "type": "command",
             "command": "python3 /absolute/path/to/codex-status-light-kit/codex_hooks/send_signal.py",
             "commandWindows": "python C:\\absolute\\path\\to\\codex-status-light-kit\\codex_hooks\\send_signal.py",
-            "timeout": 5,
+            "timeout": 12,
             "statusMessage": "Status light: waiting for approval"
           }
         ]
@@ -62,7 +62,7 @@
             "type": "command",
             "command": "python3 /absolute/path/to/codex-status-light-kit/codex_hooks/send_signal.py",
             "commandWindows": "python C:\\absolute\\path\\to\\codex-status-light-kit\\codex_hooks\\send_signal.py",
-            "timeout": 5,
+            "timeout": 12,
             "statusMessage": "Status light: tool finished"
           }
         ]
@@ -75,7 +75,7 @@
             "type": "command",
             "command": "python3 /absolute/path/to/codex-status-light-kit/codex_hooks/send_signal.py",
             "commandWindows": "python C:\\absolute\\path\\to\\codex-status-light-kit\\codex_hooks\\send_signal.py",
-            "timeout": 5,
+            "timeout": 12,
             "statusMessage": "Status light: subagent stopped"
           }
         ]
@@ -88,7 +88,7 @@
             "type": "command",
             "command": "python3 /absolute/path/to/codex-status-light-kit/codex_hooks/send_signal.py",
             "commandWindows": "python C:\\absolute\\path\\to\\codex-status-light-kit\\codex_hooks\\send_signal.py",
-            "timeout": 5,
+            "timeout": 12,
             "statusMessage": "Status light: turn complete"
           }
         ]
