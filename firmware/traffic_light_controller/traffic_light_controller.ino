@@ -1,10 +1,8 @@
-#include <EEPROM.h>
 #include "pins_config.h"
 
 const unsigned long SERIAL_BAUD = 115200;
 const unsigned long BLINK_INTERVAL_MS = 500;
 const unsigned long COMPLETE_IDLE_AFTER_MS = 60000;
-const unsigned long WAITING_IDLE_AFTER_MS = 300000;
 
 enum TrafficState : uint8_t {
   IDLE = 0,
@@ -20,6 +18,15 @@ unsigned long lastCommandAt = 0;
 unsigned long lastBlinkAt = 0;
 bool blinkOn = false;
 
+void readSerialCommand();
+String extractState(String input);
+void handleTimeouts();
+void handleStateName(const char* state);
+void applyState(TrafficState state);
+void handleBlink();
+void setLights(bool red, bool yellow, bool green);
+void writeLed(uint8_t pin, bool on);
+
 void setup() {
   Serial.begin(SERIAL_BAUD);
   Serial.setTimeout(120);
@@ -28,13 +35,7 @@ void setup() {
   pinMode(PIN_YELLOW, OUTPUT);
   pinMode(PIN_GREEN, OUTPUT);
 
-  EEPROM.begin(16);
-  uint8_t saved = EEPROM.read(0);
-  if (saved <= TOOL_ERROR) {
-    currentState = (TrafficState)saved;
-  }
-
-  applyState(currentState, true);
+  applyState(IDLE);
   Serial.println("Codex Status Light ready");
   Serial.println("Send JSON: {\"state\":\"THINKING\"}");
   Serial.println("Or send plain text: THINKING");
@@ -113,39 +114,35 @@ String extractState(String input) {
 void handleTimeouts() {
   unsigned long now = millis();
   if (currentState == TASK_COMPLETE && now - lastCommandAt > COMPLETE_IDLE_AFTER_MS) {
-    applyState(IDLE, false);
-  }
-  if (currentState == WAITING_USER && now - lastCommandAt > WAITING_IDLE_AFTER_MS) {
-    applyState(IDLE, false);
+    applyState(IDLE);
   }
 }
 
 void handleStateName(const char* state) {
-  lastCommandAt = millis();
-
   if (strcmp(state, "IDLE") == 0) {
-    applyState(IDLE, false);
+    applyState(IDLE);
   } else if (strcmp(state, "THINKING") == 0) {
-    applyState(THINKING, false);
+    applyState(THINKING);
   } else if (strcmp(state, "WAITING_USER") == 0) {
-    applyState(WAITING_USER, false);
+    applyState(WAITING_USER);
   } else if (strcmp(state, "TASK_COMPLETE") == 0) {
-    applyState(TASK_COMPLETE, false);
+    applyState(TASK_COMPLETE);
   } else if (strcmp(state, "TASK_FAILED") == 0) {
-    applyState(TASK_FAILED, false);
+    applyState(TASK_FAILED);
   } else if (strcmp(state, "TOOL_ERROR") == 0) {
-    applyState(TOOL_ERROR, false);
+    applyState(TOOL_ERROR);
   } else {
     Serial.print("Unknown state: ");
     Serial.println(state);
     return;
   }
 
+  lastCommandAt = millis();
   Serial.print("State: ");
   Serial.println(state);
 }
 
-void applyState(TrafficState state, bool forceSave) {
+void applyState(TrafficState state) {
   currentState = state;
   blinkOn = false;
   lastBlinkAt = millis();
@@ -172,10 +169,6 @@ void applyState(TrafficState state, bool forceSave) {
       break;
   }
 
-  if (forceSave || EEPROM.read(0) != (uint8_t)state) {
-    EEPROM.write(0, (uint8_t)state);
-    EEPROM.commit();
-  }
 }
 
 void handleBlink() {
@@ -188,16 +181,21 @@ void handleBlink() {
   blinkOn = !blinkOn;
 
   if (currentState == IDLE) {
-    digitalWrite(PIN_GREEN, blinkOn ? HIGH : LOW);
+    writeLed(PIN_GREEN, blinkOn);
   } else if (currentState == THINKING) {
-    digitalWrite(PIN_YELLOW, blinkOn ? HIGH : LOW);
+    writeLed(PIN_YELLOW, blinkOn);
   } else if (currentState == TOOL_ERROR) {
-    digitalWrite(PIN_RED, blinkOn ? HIGH : LOW);
+    writeLed(PIN_RED, blinkOn);
   }
 }
 
 void setLights(bool red, bool yellow, bool green) {
-  digitalWrite(PIN_RED, red ? HIGH : LOW);
-  digitalWrite(PIN_YELLOW, yellow ? HIGH : LOW);
-  digitalWrite(PIN_GREEN, green ? HIGH : LOW);
+  writeLed(PIN_RED, red);
+  writeLed(PIN_YELLOW, yellow);
+  writeLed(PIN_GREEN, green);
+}
+
+void writeLed(uint8_t pin, bool on) {
+  bool level = LED_ACTIVE_LOW ? !on : on;
+  digitalWrite(pin, level ? HIGH : LOW);
 }

@@ -7,4 +7,7 @@
 #define PIN_YELLOW D2  // GPIO4
 #define PIN_GREEN D7   // GPIO13, avoids boot mode pins
 
+// Set to 1 for a common-anode or other active-low traffic-light module.
+#define LED_ACTIVE_LOW 0
+
 #endif

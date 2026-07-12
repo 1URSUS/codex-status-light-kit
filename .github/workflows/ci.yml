@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -r codex_hooks/requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python debug_tools/simulate_hook_event.py UserPromptSubmit --simulate
+        env:
+          STATUS_LIGHT_LOG_DIR: ${{ runner.temp }}/status-light-logs
+
+  windows-installer:
+    name: Windows installer merge
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - shell: powershell
+        run: powershell -ExecutionPolicy Bypass -File .\tests\test_install_windows.ps1
+
+  firmware:
+    name: ESP8266 firmware
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/compile-sketches@v1
+        with:
+          fqbn: esp8266:esp8266:nodemcuv2
+          platforms: |
+            - name: esp8266:esp8266
+              source-url: https://arduino.esp8266.com/stable/package_esp8266com_index.json
+          sketch-paths: |
+            - firmware/traffic_light_controller
+          libraries: "[]"
